@@ -29,6 +29,33 @@ describe('swingOffset', () => {
     expect(swingOffset(10, 0.75, 8, 0.1, 14)).toBeCloseTo(0.1);
     expect(swingOffset(14, 0.75, 16, 0.1, 15)).toBe(0);
   });
+
+  it('swings later 8th groups the same as the first', () => {
+    expect(swingOffset(6, 0.75, 8, 0.1, 16)).toBeCloseTo(0.1);
+    expect(swingOffset(5, 0.75, 8, 0.1, 16)).toBeCloseTo(0.05);
+    expect(swingOffset(4, 0.75, 8, 0.1, 16)).toBe(0);
+  });
+
+  it('swings later 16th groups the same as the first', () => {
+    expect(swingOffset(7, 0.75, 16, 0.1, 16)).toBeCloseTo(0.05);
+    expect(swingOffset(6, 0.75, 16, 0.1, 16)).toBe(0);
+  });
+
+  it('swings a complete final group in a 20-step bar', () => {
+    expect(swingOffset(18, 0.75, 8, 0.1, 20)).toBeCloseTo(0.1);
+    expect(swingOffset(19, 0.75, 8, 0.1, 20)).toBeCloseTo(0.05);
+  });
+
+  it('never reorders steps at maximum swing', () => {
+    for (const note of [8, 16] as const) {
+      let prev = -Infinity;
+      for (let k = 0; k < 16; k++) {
+        const t = k * 0.1 + swingOffset(k, 0.75, note, 0.1, 16);
+        expect(t).toBeGreaterThan(prev);
+        prev = t;
+      }
+    }
+  });
 });
 
 describe('clampSwing', () => {

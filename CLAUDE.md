@@ -26,6 +26,8 @@ dependencies), deployed to GitHub Pages under `/groovebox/`.
 - Feature branch plus PR; never commit to `main`.
 - Run `npm run check` and read its output before saying "done".
 - Use conventional commit messages.
+- If a saved-state shape changes, bump the `.v1` localStorage keys or add a migration.
+- Switching tabs must stop all playback, and nothing may play from a hidden tab.
 
 ## Manual checks
 

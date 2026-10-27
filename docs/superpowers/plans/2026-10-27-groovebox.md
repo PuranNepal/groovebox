@@ -52,7 +52,7 @@ index.html                    app shell: tab bar + two tab panels
 vite.config.ts                base '/groovebox/', vitest config
 eslint.config.js, .prettierrc, tsconfig.json, package.json
 .github/workflows/ci.yml      lint, typecheck, test, build on PRs and on main
-.github/workflows/deploy.yml  build + deploy to Pages on main (Task 13)
+.github/workflows/deploy.yml  build + deploy to Pages on main (Task 12)
 CLAUDE.md, LICENSE, README.md
 src/
   main.ts                     wires tabs, both tab controllers, persistence
