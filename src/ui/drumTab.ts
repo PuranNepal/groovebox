@@ -2,28 +2,15 @@ import { getAudioContext } from '../audio/context';
 import { playDrum } from '../audio/drums';
 import { addTrack, availableSounds, removeTrack, resizePattern, toggleStep } from '../core/pattern';
 import { PRESETS, presetById, type DrumState } from '../core/presets';
-import { createScheduler } from '../core/scheduler';
-import { createStartGate } from '../core/startGate';
 import { SOUND_LABELS, isSoundId } from '../core/sounds';
 import { clampSwing, swingOffset, type SwingNote } from '../core/swing';
 import { clampBpm, secondsPerStep } from '../core/tempo';
 import { clampTimeSignature, stepsPerBar, type NoteValue } from '../core/timeSignature';
-import { button, el, highlightColumn, renderGrid } from './drumGrid';
-
-type StepMark = { step: number; time: number };
+import { button, el, numberInput } from './dom';
+import { highlightColumn, renderGrid } from './drumGrid';
+import { mountTransport } from './transport';
 
 const NOTE_VALUES: readonly NoteValue[] = [2, 4, 8, 16];
-
-function numberInput(className: string, label: string, min: number, max: number): HTMLInputElement {
-  const input = el('input', className);
-  input.type = 'number';
-  input.min = String(min);
-  input.max = String(max);
-  input.step = '1';
-  input.inputMode = 'numeric';
-  input.setAttribute('aria-label', label);
-  return input;
-}
 
 export function mountDrumMachine(
   root: HTMLElement,
@@ -31,8 +18,6 @@ export function mountDrumMachine(
   onChange: (s: DrumState) => void,
 ): { stop(): void } {
   let state: DrumState = structuredClone(initial);
-  const marks: StepMark[] = [];
-  let rafId = 0;
 
   // --- DOM ---
   const startBtn = button('start-btn', 'Start or stop the drum machine', 'Start');
@@ -157,10 +142,7 @@ export function mountDrumMachine(
   }
 
   // --- audio ---
-  const scheduler = createScheduler({
-    now: () => getAudioContext().currentTime,
-    setTimer: (fn, ms) => setInterval(fn, ms),
-    clearTimer: (id) => clearInterval(id as ReturnType<typeof setInterval>),
+  const transport = mountTransport(root, startBtn, {
     getStepDuration: () => secondsPerStep(state.bpm, state.timeSignature),
     getStepCount: () => stepsPerBar(state.timeSignature),
     getStepOffset: (step) =>
@@ -176,50 +158,11 @@ export function mountDrumMachine(
       for (const track of state.pattern.tracks) {
         if (track.steps[step]) playDrum(ctx, track.sound, time);
       }
-      marks.push({ step, time });
     },
+    onHighlight: (step) => highlightColumn(grid, step),
   });
-
-  function frame(): void {
-    const now = getAudioContext().currentTime;
-    let latest: number | null = null;
-    for (let m = marks[0]; m && m.time <= now; m = marks[0]) {
-      latest = m.step;
-      marks.shift();
-    }
-    if (latest !== null) highlightColumn(grid, latest);
-    rafId = requestAnimationFrame(frame);
-  }
-
-  const gate = createStartGate();
-
-  function stop(): void {
-    gate.cancel();
-    scheduler.stop();
-    cancelAnimationFrame(rafId);
-    marks.length = 0;
-    highlightColumn(grid, null);
-    startBtn.textContent = 'Start';
-  }
-
-  async function start(): Promise<void> {
-    const token = gate.begin();
-    try {
-      await getAudioContext().resume();
-    } catch {
-      return;
-    }
-    if (!gate.isCurrent(token) || root.hidden || scheduler.isRunning()) return;
-    scheduler.start();
-    rafId = requestAnimationFrame(frame);
-    startBtn.textContent = 'Stop';
-  }
 
   // --- events ---
-  startBtn.addEventListener('click', () => {
-    if (scheduler.isRunning()) stop();
-    else void start();
-  });
   bpmInput.addEventListener('change', () => setBpm(bpmInput.valueAsNumber));
   const onSigChange = (): void =>
     setTimeSignature(beatsInput.valueAsNumber, Number(noteSelect.value));
@@ -237,5 +180,5 @@ export function mountDrumMachine(
 
   fillPresets();
   renderAll();
-  return { stop };
+  return { stop: transport.stop };
 }

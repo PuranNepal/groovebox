@@ -2,45 +2,14 @@ import { getAudioContext } from '../audio/context';
 import { playClick } from '../audio/click';
 import { nextAccent, resizeAccents } from '../core/accents';
 import type { MetronomeState } from '../core/metronome';
-import { createScheduler } from '../core/scheduler';
-import { createStartGate } from '../core/startGate';
 import { clampBpm, secondsPerBeat } from '../core/tempo';
 import { clampTimeSignature, type NoteValue } from '../core/timeSignature';
 import { createTapTempo, shouldHandleTapKey } from '../core/tapTempo';
-
-type BeatMark = { beat: number; time: number };
+import { button, el, numberInput } from './dom';
+import { mountTransport } from './transport';
 
 const NOTE_VALUES: readonly NoteValue[] = [2, 4, 8, 16];
 const MINUS = '−';
-
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-function numberInput(className: string, label: string, min: number, max: number): HTMLInputElement {
-  const input = el('input', className);
-  input.type = 'number';
-  input.min = String(min);
-  input.max = String(max);
-  input.step = '1';
-  input.inputMode = 'numeric';
-  input.setAttribute('aria-label', label);
-  return input;
-}
-
-function button(className: string, label: string, text: string): HTMLButtonElement {
-  const b = el('button', className, text);
-  b.type = 'button';
-  b.setAttribute('aria-label', label);
-  return b;
-}
 
 export function mountMetronome(
   root: HTMLElement,
@@ -53,8 +22,6 @@ export function mountMetronome(
     accents: [...initial.accents],
   };
   const tap = createTapTempo();
-  const marks: BeatMark[] = [];
-  let rafId = 0;
 
   // --- DOM ---
   const bpmInput = numberInput('bpm-input', 'Tempo in BPM', 20, 300);
@@ -139,52 +106,12 @@ export function mountMetronome(
   }
 
   // --- audio ---
-  const scheduler = createScheduler({
-    now: () => getAudioContext().currentTime,
-    setTimer: (fn, ms) => setInterval(fn, ms),
-    clearTimer: (id) => clearInterval(id as ReturnType<typeof setInterval>),
+  const transport = mountTransport(root, startBtn, {
     getStepDuration: () => secondsPerBeat(state.bpm),
     getStepCount: () => state.timeSignature.beats,
-    onStep: (beat, time) => {
-      playClick(getAudioContext(), time, state.accents[beat] ?? 'soft');
-      marks.push({ beat, time });
-    },
+    onStep: (beat, time) => playClick(getAudioContext(), time, state.accents[beat] ?? 'soft'),
+    onHighlight: highlight,
   });
-
-  function frame(): void {
-    const now = getAudioContext().currentTime;
-    let latest: number | null = null;
-    for (let m = marks[0]; m && m.time <= now; m = marks[0]) {
-      latest = m.beat;
-      marks.shift();
-    }
-    if (latest !== null) highlight(latest);
-    rafId = requestAnimationFrame(frame);
-  }
-
-  const gate = createStartGate();
-
-  function stop(): void {
-    gate.cancel();
-    scheduler.stop();
-    cancelAnimationFrame(rafId);
-    marks.length = 0;
-    highlight(null);
-    startBtn.textContent = 'Start';
-  }
-
-  async function start(): Promise<void> {
-    const token = gate.begin();
-    try {
-      await getAudioContext().resume();
-    } catch {
-      return;
-    }
-    if (!gate.isCurrent(token) || root.hidden || scheduler.isRunning()) return;
-    scheduler.start();
-    rafId = requestAnimationFrame(frame);
-    startBtn.textContent = 'Stop';
-  }
 
   function applyTap(): void {
     const bpm = tap.tap(performance.now());
@@ -199,10 +126,6 @@ export function mountMetronome(
     setTimeSignature(beatsInput.valueAsNumber, Number(noteSelect.value));
   beatsInput.addEventListener('change', onSigChange);
   noteSelect.addEventListener('change', onSigChange);
-  startBtn.addEventListener('click', () => {
-    if (scheduler.isRunning()) stop();
-    else void start();
-  });
   tapBtn.addEventListener('click', applyTap);
   document.addEventListener('keydown', (e) => {
     if (root.hidden) return;
@@ -219,5 +142,5 @@ export function mountMetronome(
   });
 
   renderAll();
-  return { stop };
+  return { stop: transport.stop };
 }
