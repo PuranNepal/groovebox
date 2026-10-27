@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Groovebox</title>
+  </head>
+  <body>
+    <div id="app">
+      <nav class="tab-bar" role="tablist">
+        <button type="button" role="tab" data-tab="metronome">Metronome</button>
+        <button type="button" role="tab" data-tab="drums">Drums</button>
+      </nav>
+      <section id="metronome-panel" class="panel" role="tabpanel"></section>
+      <section id="drums-panel" class="panel" role="tabpanel" hidden></section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
