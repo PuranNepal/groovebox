@@ -1,4 +1,200 @@
+:root {
+  --bg: #14161a;
+  --panel: #1d2026;
+  --text: #e8eaed;
+  --muted: #8a9099;
+  --accent: #ff8a3d;
+  --strong: #ff8a3d;
+  --medium: #5fa8d3;
+  --soft: #4a7a9a;
+  --off: #2a2e35;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tab-bar button {
+  flex: 1;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.tab-bar button[aria-selected='true'] {
+  background: var(--accent);
+  color: #14161a;
+  font-weight: 600;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.bpm-row,
+.sig-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bpm-input {
+  width: 4.5ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 5rem;
+  font-weight: 700;
+  text-align: center;
+  appearance: textfield;
+}
+
+.bpm-input::-webkit-inner-spin-button,
+.bpm-input::-webkit-outer-spin-button,
+.beats-input::-webkit-inner-spin-button,
+.beats-input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.step-btn {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--panel);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.beats-input,
+.note-select {
+  width: 4rem;
+  padding: 8px;
+  border: 1px solid var(--off);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.beats-input {
+  appearance: textfield;
+}
+
+.sig-slash {
+  font-size: 1.5rem;
+  color: var(--muted);
+}
+
+.beats-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 120px;
+  width: 100%;
+}
+
+.beat-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: height 0.1s;
+}
+
+.beat-btn[data-accent='strong'] {
+  height: 100%;
+  background: var(--strong);
+}
+
+.beat-btn[data-accent='medium'] {
+  height: 70%;
+  background: var(--medium);
+}
+
+.beat-btn[data-accent='soft'] {
+  height: 40%;
+  background: var(--soft);
+}
+
+.beat-btn[data-accent='off'] {
+  height: 12%;
+  background: var(--off);
+  color: var(--muted);
+}
+
+.beat-btn.current {
+  border-color: var(--text);
+  filter: brightness(1.3);
+}
+
+.start-btn {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #14161a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tap-btn {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--off);
+  border-radius: 12px;
+  background: var(--panel);
+  font-size: 1.125rem;
+  cursor: pointer;
 }
