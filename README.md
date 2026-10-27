@@ -30,7 +30,12 @@ Settings are remembered in the browser.
 
 ```sh
 npm ci
-npm run dev
+npm run dev   # long-running dev server; stop it with Ctrl+C
+```
+
+In a separate terminal, run the full verification:
+
+```sh
 npm run check
 ```
 
