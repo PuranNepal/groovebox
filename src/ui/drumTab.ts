@@ -3,6 +3,7 @@ import { playDrum } from '../audio/drums';
 import { addTrack, availableSounds, removeTrack, resizePattern, toggleStep } from '../core/pattern';
 import { PRESETS, presetById, type DrumState } from '../core/presets';
 import { createScheduler } from '../core/scheduler';
+import { createStartGate } from '../core/startGate';
 import { SOUND_LABELS, isSoundId } from '../core/sounds';
 import { clampSwing, swingOffset, type SwingNote } from '../core/swing';
 import { clampBpm, secondsPerStep } from '../core/tempo';
@@ -190,7 +191,10 @@ export function mountDrumMachine(
     rafId = requestAnimationFrame(frame);
   }
 
+  const gate = createStartGate();
+
   function stop(): void {
+    gate.cancel();
     scheduler.stop();
     cancelAnimationFrame(rafId);
     marks.length = 0;
@@ -199,8 +203,13 @@ export function mountDrumMachine(
   }
 
   async function start(): Promise<void> {
-    await getAudioContext().resume();
-    if (scheduler.isRunning()) return;
+    const token = gate.begin();
+    try {
+      await getAudioContext().resume();
+    } catch {
+      return;
+    }
+    if (!gate.isCurrent(token) || root.hidden || scheduler.isRunning()) return;
     scheduler.start();
     rafId = requestAnimationFrame(frame);
     startBtn.textContent = 'Stop';

@@ -3,6 +3,7 @@ import { playClick } from '../audio/click';
 import { nextAccent, resizeAccents } from '../core/accents';
 import type { MetronomeState } from '../core/metronome';
 import { createScheduler } from '../core/scheduler';
+import { createStartGate } from '../core/startGate';
 import { clampBpm, secondsPerBeat } from '../core/tempo';
 import { clampTimeSignature, type NoteValue } from '../core/timeSignature';
 import { createTapTempo, shouldHandleTapKey } from '../core/tapTempo';
@@ -161,7 +162,10 @@ export function mountMetronome(
     rafId = requestAnimationFrame(frame);
   }
 
+  const gate = createStartGate();
+
   function stop(): void {
+    gate.cancel();
     scheduler.stop();
     cancelAnimationFrame(rafId);
     marks.length = 0;
@@ -170,8 +174,13 @@ export function mountMetronome(
   }
 
   async function start(): Promise<void> {
-    await getAudioContext().resume();
-    if (scheduler.isRunning()) return;
+    const token = gate.begin();
+    try {
+      await getAudioContext().resume();
+    } catch {
+      return;
+    }
+    if (!gate.isCurrent(token) || root.hidden || scheduler.isRunning()) return;
     scheduler.start();
     rafId = requestAnimationFrame(frame);
     startBtn.textContent = 'Stop';
