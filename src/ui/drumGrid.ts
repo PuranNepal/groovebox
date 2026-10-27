@@ -25,7 +25,7 @@ export type GridHandlers = {
   onRemove: (track: number) => void;
 };
 
-/** Rebuilds the grid rows (label, remove button, step buttons) for `pattern`. */
+/** Rebuilds the grid rows (label and remove button in a sticky head, then step buttons) for `pattern`. */
 export function renderGrid(
   container: HTMLElement,
   pattern: Pattern,
@@ -51,7 +51,9 @@ export function renderGrid(
       });
       steps.append(b);
     });
-    row.append(el('span', 'drum-label', label), remove, steps);
+    const head = el('div', 'drum-head');
+    head.append(el('span', 'drum-label', label), remove);
+    row.append(head, steps);
     return row;
   });
   container.replaceChildren(...rows);

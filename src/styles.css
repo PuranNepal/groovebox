@@ -257,20 +257,37 @@ select:focus-visible {
   display: none;
 }
 
+/* One horizontal scroller for all rows, so step columns stay aligned. */
 .drum-grid {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-x: auto;
 }
 
+/* A row grows wider than the scroller once its steps would drop below 14px. */
 .drum-row {
   display: grid;
-  grid-template-columns: 6.5rem 28px minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  min-width: max-content;
+}
+
+/* Label and remove button stay pinned while the steps scroll under them. */
+.drum-head {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-self: stretch;
   align-items: center;
   gap: 6px;
+  padding-right: 6px;
+  background: var(--bg);
 }
 
 .drum-label {
+  width: 6.5rem;
   overflow: hidden;
   font-size: 0.875rem;
   text-overflow: ellipsis;
@@ -292,7 +309,6 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(var(--steps), minmax(14px, 1fr));
   gap: 3px;
-  overflow-x: auto;
 }
 
 .drum-step {
