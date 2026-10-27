@@ -75,10 +75,11 @@ describe('createScheduler', () => {
     const h = harness();
     const s = createScheduler(h.deps);
     s.start();
-    for (let i = 0; i < 100 && !h.events.some((e) => e.step === 15); i++) {
+    for (let i = 0; i < 100 && h.events.at(-1)?.step !== 13; i++) {
       h.clock.t += 0.025;
       h.tick();
     }
+    expect(h.events.at(-1)?.step).toBe(13);
     h.state.count = 14;
     const before = h.events.length;
     for (let i = 0; i < 40; i++) {
