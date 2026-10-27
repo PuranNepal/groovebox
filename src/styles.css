@@ -198,3 +198,121 @@ select:focus-visible {
   font-size: 1.125rem;
   cursor: pointer;
 }
+
+#drums-panel {
+  align-items: stretch;
+  gap: 16px;
+}
+
+.drum-controls,
+.swing-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.drum-field {
+  color: var(--muted);
+}
+
+.drum-bpm {
+  width: 5rem;
+  padding: 8px;
+  border: 1px solid var(--off);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.swing-input {
+  flex: 1;
+  min-width: 100px;
+  accent-color: var(--accent);
+}
+
+.swing-value {
+  min-width: 3ch;
+  text-align: right;
+}
+
+.swing-note-btn,
+.preset-select,
+.add-sound-select {
+  padding: 8px 12px;
+  border: 1px solid var(--off);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.swing-note-btn[aria-pressed='true'] {
+  background: var(--accent);
+  color: #14161a;
+  font-weight: 600;
+}
+
+.add-sound-select[hidden] {
+  display: none;
+}
+
+.drum-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drum-row {
+  display: grid;
+  grid-template-columns: 6.5rem 28px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.drum-label {
+  overflow: hidden;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drum-remove {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drum-steps {
+  display: grid;
+  grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+  gap: 3px;
+}
+
+.drum-step {
+  height: 32px;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: var(--off);
+  cursor: pointer;
+}
+
+.drum-step.beat-start {
+  background: #3a3f48;
+}
+
+.drum-step[aria-pressed='true'] {
+  background: var(--accent);
+}
+
+.drum-step.current {
+  border-color: var(--text);
+  filter: brightness(1.4);
+}
