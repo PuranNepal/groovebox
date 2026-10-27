@@ -115,15 +115,24 @@ describe('addTrack', () => {
   it('appends a row with the current step count', () => {
     const p = emptyPattern(12);
     const copy = structuredClone(p);
-    const next = addTrack(p, 'crash');
+    const next = addTrack(p, 'crash', 12);
     expect(p).toEqual(copy);
     expect(next.tracks).toHaveLength(4);
     expect(next.tracks[3]).toEqual({ sound: 'crash', steps: new Array<boolean>(12).fill(false) });
   });
 
+  it('uses the given step count when all tracks were removed', () => {
+    let p = emptyPattern(16);
+    p = removeTrack(removeTrack(removeTrack(p, 0), 0), 0);
+    expect(p.tracks).toHaveLength(0);
+    expect(addTrack(p, 'crash', 16).tracks).toEqual([
+      { sound: 'crash', steps: new Array<boolean>(16).fill(false) },
+    ]);
+  });
+
   it('is a no-op for a sound already present', () => {
     const p = emptyPattern(16);
-    expect(addTrack(p, 'kick')).toEqual(p);
+    expect(addTrack(p, 'kick', 16)).toEqual(p);
   });
 });
 

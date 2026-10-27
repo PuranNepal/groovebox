@@ -30,9 +30,8 @@ export function resizePattern(p: Pattern, stepCount: number): Pattern {
   };
 }
 
-export function addTrack(p: Pattern, sound: SoundId): Pattern {
+export function addTrack(p: Pattern, sound: SoundId, stepCount: number): Pattern {
   if (p.tracks.some((t) => t.sound === sound)) return p;
-  const stepCount = p.tracks[0]?.steps.length ?? 0;
   return { tracks: [...p.tracks, { sound, steps: blankSteps(stepCount) }] };
 }
 
