@@ -78,7 +78,7 @@ export const PRESETS: Preset[] = [
     state: makeState(88, FOUR_FOUR, 0.58, 16, [
       ['kick', 'x......x..x.....'],
       ['snare', '....x.......x...'],
-      ['hihat', 'x.x.x.x.x.x.x.x.'],
+      ['hihat', 'xxxxxxxxxxxxxxxx'],
     ]),
   },
   {
@@ -93,11 +93,12 @@ export const PRESETS: Preset[] = [
 ];
 
 export function presetById(id: string): Preset | undefined {
-  return PRESETS.find((p) => p.id === id);
+  const found = PRESETS.find((p) => p.id === id);
+  return found ? structuredClone(found) : undefined;
 }
 
 export function defaultDrumState(): DrumState {
   const rock = presetById('rock');
   if (!rock) throw new Error('Rock preset missing');
-  return structuredClone(rock.state);
+  return rock.state;
 }

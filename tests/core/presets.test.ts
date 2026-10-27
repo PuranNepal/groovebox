@@ -62,6 +62,29 @@ describe('presetById', () => {
   });
 });
 
+describe('hip-hop swing audibility', () => {
+  it('has at least 4 hits on odd step indices', () => {
+    const state = presetById('hip-hop')!.state;
+    const odd = state.pattern.tracks.reduce(
+      (n, t) => n + t.steps.filter((on, i) => on && i % 2 === 1).length,
+      0,
+    );
+    expect(odd).toBeGreaterThanOrEqual(4);
+  });
+});
+
+describe('presetById copies', () => {
+  it('returns an independent copy each call', () => {
+    const a = presetById('rock')!;
+    a.state.bpm = 999;
+    a.state.pattern.tracks[0]!.steps[0] = !a.state.pattern.tracks[0]!.steps[0];
+    const b = presetById('rock')!;
+    expect(b.state.bpm).toBe(110);
+    expect(b.state).toEqual(PRESETS.find((p) => p.id === 'rock')!.state);
+    expect(b).not.toBe(a);
+  });
+});
+
 describe('defaultDrumState', () => {
   it('returns an independent deep copy of rock', () => {
     const a = defaultDrumState();
