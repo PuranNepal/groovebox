@@ -1,24 +1,7 @@
 import type { Pattern } from '../core/pattern';
 import { SOUND_LABELS } from '../core/sounds';
 import { stepsPerBeat, type TimeSignature } from '../core/timeSignature';
-
-export function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-export function button(className: string, label: string, text: string): HTMLButtonElement {
-  const b = el('button', className, text);
-  b.type = 'button';
-  b.setAttribute('aria-label', label);
-  return b;
-}
+import { button, el } from './dom';
 
 export type GridHandlers = {
   onToggle: (track: number, step: number) => void;
