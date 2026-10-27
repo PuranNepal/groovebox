@@ -7,7 +7,11 @@ function isTabName(value: string | undefined): value is TabName {
 export function initTabs(onSwitch: (tab: TabName) => void): void {
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-tab]');
 
+  let current: TabName | null = null;
+
   function select(tab: TabName): void {
+    if (tab === current) return;
+    current = tab;
     for (const button of buttons) {
       const name = button.dataset['tab'];
       if (!isTabName(name)) continue;
