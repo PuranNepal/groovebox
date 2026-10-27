@@ -1,0 +1,14 @@
+# Brainstorming mockups (local only)
+.superpowers/
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
